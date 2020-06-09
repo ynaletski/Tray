@@ -4,8 +4,8 @@
 /*----------------------*/
 struct s_icp_dev  *ICP_dd[]={
 
-/*&WDOG[0],                     // 0
-
+&WDOG[0],                     // 0
+/*
 #if defined(ICP_7060)
     &I7060[0],                // 2
 #endif

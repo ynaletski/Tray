@@ -1,3 +1,13 @@
+char *tray[]={
+"",
+"Паршалла",
+"RBC",
+"Вентури",
+"Водосливы с тонкой стенкой",
+"",
+};
+
+
 int n_pp=0;
 
 #define d_F2 (4)
@@ -61,12 +71,12 @@ int flag_esc=1;
 void f_prn_error()
 {
    f_clr_scr_MMI();
-    MmiGotoxy(0,1);  MmiPrintf("   Система учета расхода   ");
-    MmiGotoxy(0,2);  MmiPrintf(" воды в безнапорных потоках");
-//  MmiGotoxy(0,1);   MmiPrintf("                        ");
-    MmiGotoxy(0,5);   MmiPrintf("!Ошибка функционирования ");
-    MmiGotoxy(0,7);   MmiPrintf("Sht-F1 отображение ошибок");
-    MmiGotoxy(0,9);   MmiPrintf("Sht-ESC очистка ошибок   ");
+    MmiGotoxy(0,1);     MmiPrintf("     Система учета расхода    ");
+    MmiGotoxy(0,2);     MmiPrintf("  воды в безнапорных потоках  ");
+//  MmiGotoxy(0,1);     MmiPrintf("                              ");
+    MmiGotoxy(0,5);     MmiPrintf("  !Ошибка функционирования    ");
+    MmiGotoxy(0,7);     MmiPrintf("  Sht-F1 отображение ошибок   ");
+    MmiGotoxy(0,9);     MmiPrintf("  Sht-ESC очистка ошибок      ");
 }
 //-------------------------------------
 void  f_prn_begin()
@@ -79,8 +89,8 @@ void  f_prn_begin()
         f_clr_scr_MMI();
         //  MmiPrintf("                              ");
         #if defined(MMI_NEW)
-        MmiGotoxy(0,1);  MmiPrintf("   Система учета расхода   ");
-        MmiGotoxy(0,2);  MmiPrintf(" воды в безнапорных потоках ");
+        MmiGotoxy(0,1);  MmiPrintf("     Система учета расхода    ");
+        MmiGotoxy(0,2);  MmiPrintf("  воды в безнапорных потоках  ");
         MmiGotoxy(17,14);  MmiPrintf(" ESC - меню ");
         #endif
     }
@@ -236,11 +246,13 @@ int f_menu_MMI()
             {
                 if(PageD==0)
                 {
-                    MmiGotoxy(0,6);  MmiPrintf("  Расход воды:    28.5 м3/ч");
+                    MmiGotoxy(0,5);  MmiPrintf("Лоток        :  %s",tray[tray_num]);
+                    MmiGotoxy(0,7);  MmiPrintf("Уровень воды : %8.3f мм", level);
+                    MmiGotoxy(0,9);  MmiPrintf("Расход воды  : %8.3f м3/ч", consumption);
                 }
             }
             GetDate(&year,&month,&day);GetTime(&hour,&min,&sec);
-            MoveToXY(4,11);
+            MoveToXY(4,12);
             MmiPrintf("%02d.%02d.%02d   %02d:%02d:%02d       " ,day,month,year-2000 ,hour,min,sec);
         }
         break;

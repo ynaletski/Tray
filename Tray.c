@@ -48,11 +48,16 @@ int i;
 /* ================================================== */
 int f_cycle()
 {   // основной цикл
+
+    if( WDOG[0].status)  f_WDOG(0);
+
     ServiceCOM(1);
     //ServiceCOM(2);
     //ServiceCOM(3);
 
     f_one_sec();
+
+    if(ff_serv != NULL) (*ff_serv)(); // сканирование магистрали,
 
     if(f_menu_MMI()) return -1;
     
@@ -60,6 +65,9 @@ int f_cycle()
     {
         f_MMI();
     }
+
+    if(f_host()) return -1;
+
     return 0;
 }
 /* ================================================== */
@@ -333,3 +341,7 @@ union  { float f; char c[4]; } o;
 #include "Dos_win.c"
 
 #include "Host.c"
+
+#include "Rtu.c"
+
+#include "Cons.c"
