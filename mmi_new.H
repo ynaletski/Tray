@@ -96,6 +96,7 @@ int f_menu_MMI();
 void  f_prn_begin();
 void f_prn_CRC_error();
 void f_prn_error();
+void f_prn_menu(int count, char *menu[]);
 
 int f_timer(unsigned long int time_stamp,unsigned long int delay);
 

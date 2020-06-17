@@ -16,5 +16,6 @@
 #include "Host.h"
 #include "Rtu.h"
 #include "Cons.h"
+#include "7017c.h"
 
 #include"7188xa.h"

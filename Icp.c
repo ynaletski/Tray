@@ -12,11 +12,11 @@ struct s_icp_dev  *ICP_dd[]={
 #if defined(ICP_7041)
     &I7041[0],                // 3
 #endif
-
+*/
 #if defined(ICP_7017C)
     &I7017C[0],               // 4
 #endif
-*/
+
 
 &MMI,                         // 8
 
@@ -168,7 +168,7 @@ int i,i1;
    return 0;
 }
 /*----------------------------*/
-/*void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type )
+void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type )
 {
 int i,fl_evt;
 int fl_err_new;
@@ -204,9 +204,7 @@ int i1=0;
      }
      ICP_error_c[i]=ICP_error[i];
    }
-
    if(ICP_error[i]) fl_err_new++;
-
  }
   if(ICP_error[i]) fl_err_new++;
 
@@ -215,28 +213,28 @@ int i1=0;
     if(FL_err)
     {
 //    State_SLV=-1;
-      WD_PMP_flag=0;
-      if((ICP_DEV == &MVD[0]) && (TimeStamp < (TimeMVD_Init+TimeMVD_evt ) ) );
-      else if(fl_evt)
+     /* WD_PMP_flag=0;
+      if((ICP_DEV == &MVD[0]) && (TimeStamp < (TimeMVD_Init+TimeMVD_evt ) ) );*/
+     /* else */if ( fl_evt )
       {
-         f_wr_evt(evt_err);
+         /*f_wr_evt(evt_err);*/
       }
 
-      if(fl_GO)
+     /* if(fl_GO)
       {
        f_stop_cnt();
            f_reg_cmn(13);
       }
       OUT_VAR &= OUT7;
-      f_Drive_Stop();
+      f_Drive_Stop();*/
 
     }
     else
     {
        Reg_err = 0;
-       Out_on(OUT8);
+       /*Out_on(OUT8);*/
     }
-}*/
+}
 /*----------------------------*/
 /*void f_icp_errS(int error_type )
 {

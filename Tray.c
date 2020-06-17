@@ -55,6 +55,12 @@ int f_cycle()
     //ServiceCOM(2);
     //ServiceCOM(3);
 
+    #if defined(ICP_7017C)
+    if(I7017C[0].status)  f_7017C(0);
+    #endif
+
+    f_calc_cons();
+    
     f_one_sec();
 
     if(ff_serv != NULL) (*ff_serv)(); // сканирование магистрали,
@@ -345,3 +351,7 @@ union  { float f; char c[4]; } o;
 #include "Rtu.c"
 
 #include "Cons.c"
+
+#if defined(ICP_7017C)
+#include "7017c.c"
+#endif

@@ -2,11 +2,11 @@
 #define ICP 0
 #define RTU 1
 
-// кодировка Reg_err
-// 0x1 .... 0x4 - побитовые ошибки устройств из
+// я┐╜я┐╜я┐╜я┐╜ровя┐╜я┐╜ Reg_err
+// 0x1 .... 0x4 - я┐╜я┐╜я┐╜я┐╜товя┐╜ я┐╜шибя┐╜я┐╜ я┐╜я┐╜я┐╜ройя┐╜я┐╜ я┐╜я┐╜
 // списка:
 //  struct s_icp_dev  *ICP_dd[]={};
-// начиная со второго (WDOG[0] не считается)
+// я┐╜я┐╜чиня┐╜я┐╜ я┐╜ я┐╜я┐╜рогя┐╜ (WDOG[0] я┐╜я┐╜ я┐╜я┐╜таея┐╜я┐╜я┐╜)
 
 
 
@@ -71,7 +71,7 @@ int ffgets_com_ICP( int ii);
 int f_empty_gets(int ii);
 int f_check_crc_ICP(char *buf);
 int f_prepare7000(char *Cmd,int CRC_flag);
-//void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type );
+void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type );
 //void f_cl_error();
 //int f_get_icp_error(struct s_icp_dev *ICP_DEV );
 //void f_icp_errS(int error_type );
@@ -100,10 +100,10 @@ long int pool_time;
 long int time_stamp_pool;
 long int time_stamp_snd;
 long int time_stamp_rcv;
-long int n_transaction  ;  // количество транзакций с каналом
-long int n_success      ;  // количество успешных транзакций
-long int n_timeout_error;  // кол.ошибок по таймауту
-long int n_CRC_error    ;  // кол. ошибок контрольной суммы
+long int n_transaction  ;  // я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜тво я┐╜раня┐╜я┐╜я┐╜ций я┐╜ я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜
+long int n_success      ;  // я┐╜я┐╜я┐╜я┐╜я┐╜я┐╜тво я┐╜спея┐╜я┐╜я┐╜ я┐╜раня┐╜я┐╜я┐╜ций
+long int n_timeout_error;  // я┐╜я┐╜я┐╜.я┐╜шибя┐╜я┐╜ я┐╜я┐╜ тайя┐╜я┐╜я┐╜я┐╜я┐╜
+long int n_CRC_error    ;  // я┐╜я┐╜я┐╜. я┐╜шибя┐╜я┐╜ я┐╜я┐╜я┐╜я┐╜рольноя┐╜ я┐╜уммя┐╜
 struct COM_rqst *request;
 };
 //---------------
