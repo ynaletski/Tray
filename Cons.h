@@ -1,6 +1,9 @@
 extern float consumption;
 extern float level;
 
+extern float real_level;
+extern float zero_level;
+
 extern float c0;
 extern float expN;
 void f_calc_cons(void);

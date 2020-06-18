@@ -1277,6 +1277,16 @@ struct dis_set  ds_pass[]=
 /*----------------*/
 };
 //----------------------
+struct dis_set  ds_level[]=
+{
+/*----------------*/
+  &zero_level,
+  0,
+  BIG_P,
+  T_FLOAT,
+};
+//----------------------
+
 
 int f_intr()
 {
@@ -1377,6 +1387,12 @@ int f_intr()
           goto fin;
         }
 //------------------------------------------
+      if (!strcmp(intrpr.wrd,"LEVEL" ))
+        {   //'PASS'Password
+          f_dis_set(ds_level,5,1); //5-длина введенного слова 1-колличество элементов
+          goto fin;
+        }
+//---------------------------------
         if  ((intrpr.wrd[0]=='D') &&(intrpr.wrd[1]=='R')&&(intrpr.wrd[2]=='V'))
         {   //'DRV'
          if( ((i=f_123(4)) >= 0 ) &&  (i< icp_lst_max ) )

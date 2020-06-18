@@ -5,15 +5,20 @@
 int Ytray = 2; //положение курсора > на MMI
 
 float consumption = 28.5; //m3/h расход 
-float level = 524;  //УРОВЕНЬ В СМ
+float level = 524;  //УРОВЕНЬ В СМ измеренный уровнемером
 int tray_num = 1; //номер выбранного лотка
+
+float real_level=0; //расчетный уровень
+float zero_level=5000; //уровень до дна
 
 float c0 = 0.1407;
 float expN = 1.55;
 
 void f_calc_cons (void)
 {
-    consumption = c0 * pow(level,expN) * l_to_m3;
+    if (zero_level > level && level > 0) real_level = zero_level - level;
+    else real_level = 0;
+    consumption = c0 * pow(real_level,expN) * l_to_m3;
 }
 
 int num_tmp=0;

@@ -433,6 +433,7 @@ struct eee_dat EE_Dat[]=
 &expN,sizeof(expN),
 &Qmax,sizeof(Qmax),
 &Qmin,sizeof(Qmin),
+&zero_level,sizeof(zero_level),
 
 &Eeprom_summ,sizeof(Eeprom_summ),
 
