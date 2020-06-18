@@ -25,5 +25,3 @@ extern long int Lvl_7017[12];
 
 extern unsigned int INP_7017;
 extern float P_inp;
-
-

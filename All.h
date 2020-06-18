@@ -17,5 +17,6 @@
 #include "Rtu.h"
 #include "Cons.h"
 #include "7017c.h"
+#include "Eee.h"
 
 #include"7188xa.h"

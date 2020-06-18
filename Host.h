@@ -1,3 +1,8 @@
+struct eee_dat {
+void *ptr;
+int l;
+};
+
 void f_send_to_Host_rtu(int ii);
 
 extern int ComPortHost;

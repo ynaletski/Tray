@@ -109,6 +109,18 @@ void main(void)
     timezone=0;
 
     f_queue_init();
+    f_ee_num_init();
+    if(f_chk_EEE_CRC()<0)
+    {
+      m_n_ee:
+      InstallCom(ComPortHost,ComBaud[4],8,0,1);
+      printf("CRC Error.Default loaded\n");
+      sw_mmi=99;
+    }
+    else
+    {
+      f_rd_eee();
+    }
 
     ComBaud[ComPortHost]=115200L;
     InstallCom(ComPortHost,ComBaud[ComPortHost],Com_lgth[ComPortHost],Com_parity[ComPortHost],Com_stop[ComPortHost]);
@@ -118,10 +130,15 @@ void main(void)
     if(sw_mmi==0 )
     {
         printf("\nFacom Ver.%s",sw_ver);
+        f_prn_begin();
     }
+    else
+    {
+      f_prn_CRC_error();
+    }
+    
     SetDisplayPage(ZeroPage);
-    f_prn_begin();
-
+    
     for(i=1;i<4;i++)
     {
     if(f_get_nb(ComBaud[i]) <0)  ComBaud[i]=9600L;
@@ -355,3 +372,5 @@ union  { float f; char c[4]; } o;
 #if defined(ICP_7017C)
 #include "7017c.c"
 #endif
+
+#include "Eee.c"

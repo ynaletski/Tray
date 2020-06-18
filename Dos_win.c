@@ -142,6 +142,7 @@ char str[31];
 void  f_prn_begin()
 {
     if(flag_esc == 0) goto m1;
+    else if(CRC_err) f_prn_CRC_error();
     else if(FL_err) f_prn_error();
     else
     {
@@ -154,6 +155,17 @@ void  f_prn_begin()
         MmiGotoxy(17,15);  MmiPrintf(" ESC - меню ");
         #endif
     }
+}
+//-------------------------------------
+int CRC_err=0;
+//-------------------------------------
+void f_prn_CRC_error()
+{
+ MmiGotoxy(0,2);   MmiPrintf("!Ошибка контрольной суммы   ");
+ MmiGotoxy(0,3);   MmiPrintf("!Параметры потеряны         ");
+ MmiGotoxy(0,4);   MmiPrintf("!Необходима перенастройка   ");
+ MmiGotoxy(0,5);   MmiPuts(s_empty);
+ CRC_err=1;
 }
 //-------------------------------------
 //-------------------------------
@@ -317,7 +329,7 @@ int f_menu_MMI()
                         MmiGotoxy(0,4); MmiPuts("                              ");
                     }
                     MmiGotoxy(0,5);  MmiPrintf("Лоток       : %s",tray[tray_num]);
-                    MmiGotoxy(0,7);  MmiPrintf("Диап.измер. : (%5.2f-%5.2f)",Qmin,Qmax);
+                    MmiGotoxy(0,7);  MmiPrintf("Диап.измер. : %5.2f-%5.2f",Qmin,Qmax);
                     MmiGotoxy(0,9);  MmiPrintf("Уровень воды: %8.3f см", level);
                     MmiGotoxy(0,11); MmiPrintf("Расход воды : %8.3f м3/ч", consumption);
                 }

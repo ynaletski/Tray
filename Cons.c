@@ -19,7 +19,6 @@ void f_calc_cons (void)
 int num_tmp=0;
 int max_count_tmp=0;
 
-int num_type = 1;
 float Qmax = 30;  //расход вводимый вручную
 float Qmin = 1;   //расход вводимый вручную
 

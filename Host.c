@@ -1216,6 +1216,67 @@ struct dis_set  ds_scan[4]=
 /*----------------*/
 };
 //----------------------
+struct dis_set  ds_mka[]=
+{
+/*----------------*/
+  &analog_num[0],
+  0,
+  10,
+  T_INT,
+/*----------------*/
+  &analog_num[1],
+  0,
+  10,
+  T_INT,
+/*----------------*/
+};
+//----------------------
+float ftmp_na[2];
+struct dis_set  ds_na[]=
+{
+/*----------------*/
+  &ftmp_na[0],
+  -BIG_P,
+  BIG_P,
+  T_FLOAT,
+/*----------------*/
+  &ftmp_na[1],
+  -BIG_P,
+  BIG_P,
+  T_FLOAT,
+/*----------------*/
+};
+//----------------------
+struct dis_set  ds_no[]=
+{
+/*----------------*/
+  &analog_offset[0],
+  -BIG_P,
+  BIG_P,
+  T_FLOAT,
+/*----------------*/
+  &analog_offset[1],
+  -BIG_P,
+  BIG_P,
+  T_FLOAT,
+/*----------------*/
+};
+//----------------------
+struct dis_set  ds_pass[]=
+{
+/*----------------*/
+  &Password,
+  0,
+  BIG_P,
+  T_INT_L,
+/*----------------*/
+  &Password_m,
+  0,
+  BIG_P,
+  T_INT_L,
+/*----------------*/
+};
+//----------------------
 
 int f_intr()
 {
@@ -1272,8 +1333,50 @@ int f_intr()
           goto fin;
         }*/
 //---------------------------------
-     
+       if (!strcmp(intrpr.wrd,"WE" ))
+       {   //'WE'
+        if(f_wrt_eee()<0)
+        {
+          goto fin_e;
+        }
+        else
+        {
+          if(flag_echo_host )
+          printf(" %d",ee_members);
+        }
+        goto fin;
+       }
 //---------------------------------
+      if (!strcmp(intrpr.wrd,"MKA" ))
+        {   //'MKA'
+          f_dis_set(ds_mka,3,2);
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"NA" ))
+        {   //'NA'
+          ftmp_na[0]=analog_scale[0]*NA_scale;
+          ftmp_na[1]=analog_scale[1]*NA_scale;
+          if(f_dis_set(ds_na,2,2)>0)
+          {
+           analog_scale[0]=ftmp_na[0]/NA_scale;
+           analog_scale[1]=ftmp_na[1]/NA_scale;
+          }
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"NO" ))
+        {   //'NO'
+          f_dis_set(ds_no,2,2);
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"PASS" ))
+        {   //'PASS'Password
+          f_dis_set(ds_pass,4,2);
+          goto fin;
+        }
+//------------------------------------------
         if  ((intrpr.wrd[0]=='D') &&(intrpr.wrd[1]=='R')&&(intrpr.wrd[2]=='V'))
         {   //'DRV'
          if( ((i=f_123(4)) >= 0 ) &&  (i< icp_lst_max ) )

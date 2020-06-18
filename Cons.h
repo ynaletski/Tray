@@ -6,7 +6,6 @@ extern float expN;
 void f_calc_cons(void);
 
 extern int tray_num;
-extern int num_type;
 
 extern float Qmax;
 extern float Qmin;
