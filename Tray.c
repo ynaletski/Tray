@@ -378,3 +378,5 @@ union  { float f; char c[4]; } o;
 #include "Eee.c"
 
 #include "Arch.c"
+
+#include "Md5c.c"

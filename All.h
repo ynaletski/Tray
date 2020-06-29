@@ -19,5 +19,6 @@
 #include "7017c.h"
 #include "Eee.h"
 #include "Arch.h"
+#include "Md5.h"
 
 #include"7188xa.h"

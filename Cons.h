@@ -48,7 +48,7 @@ extern int Ytray;   //положение курсора > на MMI
 #define ThinWall    5
 #define Palmera 6
 #define Montana 7
-#define HS-type 8
-#define H-type  9
+#define HS_type 8
+#define H_type  9
 #define Triangle    10
 #define Trapezoid   11

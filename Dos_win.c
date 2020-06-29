@@ -380,6 +380,17 @@ int f_menu_MMI()
                 PassW=0;
                 Ytray=2; //положение курсора > на MMI
             }
+            else if(key== '2') // 8 Версия sw
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);   MmiPrintf("Версия %s",sw_ver);
+                MmiGotoxy(0,2);   MmiPrintf("   MD5 идет расчет ...");
+                MmiGotoxy(0,6);   MmiPuts(" ESC   - возврат в меню");
+                tm_md=TimeStamp;
+                sw_mmi=271;
+                break;
+            }
             else if(key== '3') // 4  Сервисные функции
             {
                 m_m3:
@@ -388,9 +399,9 @@ int f_menu_MMI()
                 MmiGotoxy(0,0);    MmiPuts(" Меню 3. Сервисные функции.");
                 MmiGotoxy(0,2);    MmiPuts("1  Список драйверов");
                 MmiGotoxy(0,4);    MmiPuts("2  Статистика  драйверов");
-                MmiGotoxy(0,6);    MmiPuts("3  Просмотр/ввод параметров");
-                MmiGotoxy(0,8);    MmiPuts("4  Другие функции");
-                MmiGotoxy(0,10);    MmiPuts("5  Время, дата");
+                //MmiGotoxy(0,6);    MmiPuts("3  Просмотр/ввод параметров");
+                //MmiGotoxy(0,8);    MmiPuts("4  Другие функции");
+                MmiGotoxy(0,6);    MmiPuts("3  Время, дата");
                 MmiGotoxy(0,15);    MmiPuts("ESC  Возврат");
                 sw_mmi=150;
                 PassW=0;
@@ -718,7 +729,7 @@ int f_menu_MMI()
                 pass_cnt=0;
                 sw_mmi=23;
             }
-            else if(key== '3')   //  3  Просмотр/ввод параметров
+           /* else if(key== '3')   //  3  Просмотр/ввод параметров
             {
                 m_m3_3:
                 // переход в меню выбора точки для просмотра параметров
@@ -741,8 +752,8 @@ int f_menu_MMI()
                 MmiGotoxy(0,6);    MmiPuts("ESC  Возврат");
                 sw_mmi=160;
                 break;
-            }
-            else if(key== '5')   //  5  Время, дата
+            }*/
+            else if(key== '3')   //  5  Время, дата
             {
                 m_m3_5:
                 //f_prepare_t ( &adate00);
@@ -881,6 +892,25 @@ int f_menu_MMI()
             }
         break;
         /*========================================*/
+        case 271:/* ожидание нажатия ESC,Enter */
+            if((key==ESC)||(key==ENTER)  )
+            {
+                goto m0_f1;
+            }
+            if( (f_timer(tm_md,(long int)1000 )) | fl_md_fst )
+            {
+                f_md5(1);
+                sw_mmi=272;
+            }
+        break;
+        /*========================================*/
+        case 272:
+            if((key==ESC)||(key==ENTER))  /* переход на начальную страницу */
+            {
+                goto m0_f1;
+            }
+        break;
+ /*========================================*/
         default:
             if((key==ESC)||(key==ENTER))  /* переход на начальную страницу */
             {

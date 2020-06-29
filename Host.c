@@ -1337,11 +1337,11 @@ int f_intr()
           goto fin;
         }
 //---------------------------------
-/*      if (!strcmp(intrpr.wrd,"MD5" ))
+      if (!strcmp(intrpr.wrd,"MD5" ))
         {   //'MD5'
           f_md5(0);
           goto fin;
-        }*/
+        }
 //---------------------------------
        if (!strcmp(intrpr.wrd,"WE" ))
        {   //'WE'
