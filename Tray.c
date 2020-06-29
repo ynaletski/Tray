@@ -343,12 +343,14 @@ union  { float f; char c[4]; } o;
 
   GetTimeDate(&t);
 
-    WriteNVRAM((int)nr_year   ,(int)(t.year-2000));
-    WriteNVRAM((int)nr_month  ,(int)t.month  );
-    WriteNVRAM((int)nr_day    ,(int)t.day    );
-    WriteNVRAM((int)nr_hour   ,(int)t.hour   );
-    WriteNVRAM((int)nr_min    ,(int)t.minute );
-    WriteNVRAM((int)nr_sec    ,(int)t.sec    );
+  WriteNVRAM((int)nr_year   ,(int)(t.year-2000));
+  WriteNVRAM((int)nr_month  ,(int)t.month  );
+  WriteNVRAM((int)nr_day    ,(int)t.day    );
+  WriteNVRAM((int)nr_hour   ,(int)t.hour   );
+  WriteNVRAM((int)nr_min    ,(int)t.minute );
+  WriteNVRAM((int)nr_sec    ,(int)t.sec    );
+
+  
 }
 /*-----------------------------------------*/
 /*================================================================*/
@@ -374,3 +376,5 @@ union  { float f; char c[4]; } o;
 #endif
 
 #include "Eee.c"
+
+#include "Arch.c"

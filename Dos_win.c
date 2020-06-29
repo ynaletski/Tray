@@ -186,7 +186,7 @@ int max_par=1;
 
 int FlagWinSum=0;
 
-//struct arch_str_t adate11;
+struct arch_str_t adate11;
 
 struct dis_set_MMI *ds_list=NULL;
 
@@ -774,6 +774,103 @@ int f_menu_MMI()
                 f_d_ESC();
                 sw_mmi=162;
                 break;
+            }
+        break;
+        /*========================================*/
+        case 165:   //  Ввод даты для изменения
+            if((key==ESC)||(key==ENTER)||(key==DATA_ESC))    /* переход в меню */
+            {
+                goto m_m3;
+            }
+            else if(key==DATA)
+            {
+                year=(int)(adate00.year+2000);
+                month=(int)adate00.month;
+                day=(int)adate00.day;
+                sscanf(fst_str,"%d.%d.%d",&day,&month,&year);
+                if((year<2000)||(year > 2100)) goto m_m3_5;
+                if((month<1)|| (month > 12))  goto m_m3_5;
+                if((day<1)|| (day > 31))  goto m_m3_5;
+                adate00.year = year-2000 ;
+                adate00.month = month;
+                adate00.day = day;
+                // дата введена
+                if((adate00.year  != adate11.year ) ||
+                    (adate00.month != adate11.month) ||
+                    (adate00.day   != adate11.day  ) )
+                {
+                    // printf("\n\r %02d.%02d.%02d" ,day,month,year-2000);
+                    //f_wr_evt(evt_none);
+                    SetDate( year, month, day);
+                    WriteNVRAM((int)nr_year  ,(int)(year-2000));
+                    WriteNVRAM((int)nr_month ,(int)month  );
+                    WriteNVRAM((int)nr_day   ,(int)day    );
+                    //init_win_sum(0);
+                    //f_wr_evt(evt_ch_date);
+                    adate11=adate00;
+                    //printf("\n\r Date have changed ");
+                }
+                m_m3_5_1:
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("      Текущее время ");
+                MmiGotoxy(0,1);    MmiPuts("       Час Мин Сек");
+                // MmiGotoxy(0,2);    MmiPuts("         08.01.00");
+                MmiGotoxy(0,3);
+                /*if(FlagWinSum==0)             MmiPuts("Переход лет/зим.время выключен");
+                else                          MmiPuts("Переход лет/зим.время включен");*/
+                /*
+                if(ReadNVRAM(nr_win_sum))
+                // 1 - летнее
+                                              MmiPuts("      Летнее время");
+                     else                     MmiPuts("      Зимнее время");
+                */
+                MmiGotoxy(0,4);    MmiPuts(" 0...9,'.' - изменить");
+                MmiGotoxy(0,5);    MmiPuts(" Enter - ввод");
+                MmiGotoxy(0,6);    MmiPuts(" ESC   - отменить");
+                MmiGotoxy(8,2);
+                sprintf(fst_str,"%02d.%02d.%02d",(int)adate00.hour,(int)adate00.min,(int)adate00.sec);
+                fst_n=9;
+                sw_fst=1;
+                sw_mmi=166;
+            }
+        break;
+
+ /*========================================*/
+        case 166:   //  Ввод времени
+            if((key==ESC)||(key==ENTER)||(key==DATA_ESC))    /* переход в меню */
+            {
+                goto m_m3_5;
+            }
+            else if(key==DATA)
+            {
+                hour=(int)adate00.hour;
+                min=(int)adate00.min;
+                sec=(int)adate00.sec;
+                sscanf(fst_str,"%d.%d.%d",&hour,&min,&sec);
+                if((min<0)|| (min > 59))  goto m_m3_5_1;
+                if((sec<0)|| (sec > 59))  goto m_m3_5_1;
+                if((hour<0)|| (hour > 23))  goto m_m3_5_1;
+                adate00.min = min;
+                adate00.hour = hour;
+                adate00.sec = sec;
+                // время введено
+                if((adate00.hour  != adate11.hour ) ||
+                    (adate00.min   != adate11.min) ||
+                    (adate00.sec   != adate11.sec  ) )
+                {
+                    //printf("\n\r Time have changed ");
+                    //f_wr_evt(evt_none);
+                    SetTime( adate00.hour, adate00.min,adate00.sec);
+                    WriteNVRAM((int)nr_hour   ,(int)hour   );
+                    WriteNVRAM((int)nr_min    ,(int)min    );
+                    WriteNVRAM((int)nr_sec    ,(int)sec    );
+                    //init_win_sum(0);
+                    //f_wr_evt(evt_ch_time);
+                }
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                goto m_m3;
             }
         break;
         /*========================================*/

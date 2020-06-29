@@ -18,5 +18,6 @@
 #include "Cons.h"
 #include "7017c.h"
 #include "Eee.h"
+#include "Arch.h"
 
 #include"7188xa.h"
