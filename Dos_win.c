@@ -331,7 +331,7 @@ int f_menu_MMI()
                     MmiGotoxy(0,5);  MmiPrintf("Лоток       : %s",tray[tray_num]);
                     MmiGotoxy(0,7);  MmiPrintf("Диап.измер. : %5.2f-%5.2f",Qmin,Qmax);
                     MmiGotoxy(0,9);  MmiPrintf("Уровень воды: %8.3f см", real_level);
-                    MmiGotoxy(0,11); MmiPrintf("Расход воды : %8.3f м3/ч", consumption);
+                    MmiGotoxy(0,11); MmiPrintf("Расход воды : %8.3f м3/ч  ", consumption);
                 }
             }
             GetDate(&year,&month,&day);GetTime(&hour,&min,&sec);

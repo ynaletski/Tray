@@ -1,4 +1,4 @@
-//consumption
+//consumption - расход
 #define m3_to_l  (0.27777777777777)
 #define l_to_m3  (3.6)
 
@@ -6,7 +6,7 @@ int Ytray = 2; //положение курсора > на MMI
 
 float consumption = 28.5; //m3/h расход 
 float level = 524;  //УРОВЕНЬ В СМ измеренный уровнемером
-int tray_num = 1; //номер выбранного лотка
+int tray_num = 3; //номер выбранного лотка
 
 float real_level=0; //расчетный уровень
 float zero_level=5000; //уровень до дна

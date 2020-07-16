@@ -63,6 +63,8 @@ int f_cycle()
     
     f_one_sec();
 
+    f_arch();
+
     if(ff_serv != NULL) (*ff_serv)(); // сканирование магистрали,
 
     if(f_menu_MMI()) return -1;
@@ -100,13 +102,19 @@ void main(void)
     char cmd[40];
     int key;
     int iRet;
-    int year,month,day,hour,min,sec;
 
     int itmp;
-    InitLib();
+    InitLib();X607_Init();
     tzset();
     daylight=0;
     timezone=0;
+
+    RestoreBasicParameters();
+    InitializeMain();
+
+    ComBaud[ComPortHost]=115200L;
+    InstallCom(ComPortHost,ComBaud[ComPortHost],Com_lgth[ComPortHost],Com_parity[ComPortHost],Com_stop[ComPortHost]);
+
 
     f_queue_init();
     f_ee_num_init();
@@ -121,9 +129,6 @@ void main(void)
     {
       f_rd_eee();
     }
-
-    ComBaud[ComPortHost]=115200L;
-    InstallCom(ComPortHost,ComBaud[ComPortHost],Com_lgth[ComPortHost],Com_parity[ComPortHost],Com_stop[ComPortHost]);
 
     f_clr_scr_MMI();
 
@@ -350,7 +355,7 @@ union  { float f; char c[4]; } o;
   WriteNVRAM((int)nr_min    ,(int)t.minute );
   WriteNVRAM((int)nr_sec    ,(int)t.sec    );
 
-  
+  flg_sec=1;
 }
 /*-----------------------------------------*/
 /*================================================================*/
