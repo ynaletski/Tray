@@ -307,8 +307,6 @@ struct eee_dat EE_Dat[]=
 
 &byte_timout_rtu[0]   ,sizeof(byte_timout_rtu),
 &scom_tim[0]   ,sizeof(scom_tim),
-
-&fict_itmp   ,sizeof(fict_itmp  ),
 //-----------------------
 
 &FlagWinSum ,sizeof(FlagWinSum ),
@@ -434,6 +432,7 @@ struct eee_dat EE_Dat[]=
 &Qmax,sizeof(Qmax),
 &Qmin,sizeof(Qmin),
 &zero_level,sizeof(zero_level),
+&contrh,sizeof(contrh),
 
 &Eeprom_summ,sizeof(Eeprom_summ),
 

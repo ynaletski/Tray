@@ -303,6 +303,7 @@ int f_menu_MMI()
                 MmiGotoxy(0,4);     MmiPuts("2  Версия ПО ");
                 //MmiGotoxy(0,6);     MmiPuts("3  Просмотр журнала событий");
                 MmiGotoxy(0,6);     MmiPuts("3  Сервисные функции");
+                MmiGotoxy(0,8);     MmiPuts("4  Накопленные счетчики");
                 MmiGotoxy(0,15);    MmiPuts("                ESC  Возврат");
             }
             else
@@ -380,7 +381,7 @@ int f_menu_MMI()
                 PassW=0;
                 Ytray=2; //положение курсора > на MMI
             }
-            else if(key== '2') // 8 Версия sw
+            else if(key== '2') // 2 Версия sw
             {
                 SetDisplayPage(EmptPage);
                 f_clr_scr_MMI();
@@ -391,7 +392,7 @@ int f_menu_MMI()
                 sw_mmi=271;
                 break;
             }
-            else if(key== '3') // 4  Сервисные функции
+            else if(key== '3') // 3  Сервисные функции
             {
                 m_m3:
                 SetDisplayPage(EmptPage);
@@ -405,6 +406,26 @@ int f_menu_MMI()
                 MmiGotoxy(0,15);    MmiPuts("ESC  Возврат");
                 sw_mmi=150;
                 PassW=0;
+            }
+            else if(key== '4') // 4 Накопленные счетчики
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts(" Меню 4. Накопленные счетчики.");
+                MmiGotoxy(0,2);  MmiPrintf("Средний : %8.3f  м3/ч", cons.avg);
+                MmiGotoxy(0,4);  MmiPrintf("Минута  : %8.3f  м3", cons.accum);
+                MmiGotoxy(0,5);  MmiPrintf("Час     : %8.3f  м3", cons.hour);
+                MmiGotoxy(0,6);  MmiPrintf("Пр.час  : %8.3f  м3", cons.last_hour);
+                MmiGotoxy(0,7);  MmiPrintf("День    : %8.3f  м3", cons.day);
+                MmiGotoxy(0,8);  MmiPrintf("Пр.день : %8.3f  м3", cons.last_day);
+                MmiGotoxy(0,9);  MmiPrintf("Месяц   : %8.3f  м3", cons.month);
+                MmiGotoxy(0,10);  MmiPrintf("Пр.мес. : %8.3f  м3", cons.last_month);
+                MmiGotoxy(0,11);  MmiPrintf("Год     : %8.3f  м3", cons.year);
+                MmiGotoxy(0,15);   MmiPuts("                ESC  Возврат");
+
+                tm_md=TimeStamp;
+                sw_mmi=140;
+                break;
             }
         break;
         /*========================================*/
@@ -701,6 +722,22 @@ int f_menu_MMI()
             {
                 goto m_m1s_2;
             }
+        break;
+        /*========================================*/
+        case 140: // 4 Накопленные счетчики
+            if((key==ESC)||(key==ENTER))    /* переход в меню */
+            {
+                goto main_menu;
+            }
+            MmiGotoxy(0,2);  MmiPrintf("Средний : %8.3f  м3/ч", cons.avg);
+            MmiGotoxy(0,4);  MmiPrintf("Минута  : %8.3f  м3", cons.accum);
+            MmiGotoxy(0,5);  MmiPrintf("Час     : %8.3f  м3", cons.hour);
+            MmiGotoxy(0,6);  MmiPrintf("Пр.час  : %8.3f  м3", cons.last_hour);
+            MmiGotoxy(0,7);  MmiPrintf("День    : %8.3f  м3", cons.day);
+            MmiGotoxy(0,8);  MmiPrintf("Пр.день : %8.3f  м3", cons.last_day);
+            MmiGotoxy(0,9);  MmiPrintf("Месяц   : %8.3f  м3", cons.month);
+            MmiGotoxy(0,10);  MmiPrintf("Пр.мес. : %8.3f  м3", cons.last_month);
+            MmiGotoxy(0,11);  MmiPrintf("Год     : %8.3f  м3", cons.year);
         break;
         /*========================================*/
         case 150: // 3  Сервисные функции

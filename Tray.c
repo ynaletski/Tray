@@ -115,7 +115,6 @@ void main(void)
     ComBaud[ComPortHost]=115200L;
     InstallCom(ComPortHost,ComBaud[ComPortHost],Com_lgth[ComPortHost],Com_parity[ComPortHost],Com_stop[ComPortHost]);
 
-
     f_queue_init();
     f_ee_num_init();
     if(f_chk_EEE_CRC()<0)

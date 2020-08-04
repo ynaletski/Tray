@@ -1,3 +1,11 @@
+//experiment
+float rrr;
+float www;
+unsigned char cccr[4];
+unsigned char bbbuf[10];
+///////////////////////////////////
+
+
 int EchoComN=0;
 int ComPortHost=4;
 
@@ -1286,6 +1294,30 @@ struct dis_set  ds_level[]=
   T_FLOAT,
 };
 //----------------------
+struct dis_set  ds_contrh[]=
+{
+/*----------------*/
+  &contrh,
+  0,
+  20,
+  T_INT,
+};
+//----------------------
+struct dis_set  ds_factor[]=
+{
+/*----------------*/
+  &c0,
+  0,
+  100,
+  T_FLOAT,
+/*----------------*/
+  &expN,
+  0,
+  100,
+  T_FLOAT,
+/*----------------*/
+};
+//----------------------
 
 
 int f_intr()
@@ -1336,10 +1368,42 @@ int f_intr()
 //        (*(void (*)())adr_strt)();
           goto fin;
         }
+
+
+
+
+//---------------------------------
+//experiment
+      if (!strcmp(intrpr.wrd,"write" ))
+        {   //'MD5'
+          www=111.111;
+          printf ("\n\r %f \n\r",www);
+          ConvToBynare(www,cccr);
+          printf ("\n\r %x%x%x%x \n\r",cccr[0],cccr[1],cccr[2],cccr[3]);
+          X607_WriteFn(0x3000,4,cccr);
+          goto fin;
+        }
+
+      if (!strcmp(intrpr.wrd,"read" ))
+        {   //'MD5'
+          rrr=222.222;
+          printf ("\n\r %f \n\r",rrr);
+          X607_ReadFn(0x3000,4,bbbuf);
+          printf ("\n\r %x%x%x%x \n\r",bbbuf[0],bbbuf[1],bbbuf[2],bbbuf[3]);
+          ConvToFloatVerify(&rrr,bbbuf[0],bbbuf[1],bbbuf[2],bbbuf[3]);
+          printf ("\n\r %f \n\r",rrr);
+          goto fin;
+        }
 //---------------------------------
       if (!strcmp(intrpr.wrd,"MD5" ))
         {   //'MD5'
           f_md5(0);
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"COUNTERS" ))
+        {   //'MD5'
+          cons.accum=cons.avg=cons.day=cons.hour=cons.month=cons.year=0;
           goto fin;
         }
 //---------------------------------
@@ -1388,8 +1452,20 @@ int f_intr()
         }
 //------------------------------------------
       if (!strcmp(intrpr.wrd,"LEVEL" ))
-        {   //'PASS'Password
+        {   //LEVEL
           f_dis_set(ds_level,5,1); //5-длина введенного слова 1-колличество элементов
+          goto fin;
+        }
+//------------------------------------------
+      if (!strcmp(intrpr.wrd,"CONTRH" ))
+        {   //CONTRH
+          f_dis_set(ds_contrh,6,1); //6-длина введенного слова 1-колличество элементов
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"FACTOR" ))
+        {   //'FACTOR'
+          f_dis_set(ds_factor,6,2); //6-длина введенного слова 2-колличество элементов
           goto fin;
         }
 //---------------------------------

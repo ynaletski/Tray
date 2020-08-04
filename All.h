@@ -22,3 +22,4 @@
 #include "Md5.h"
 
 #include"7188xa.h"
+#include<X607.h>

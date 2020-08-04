@@ -43,9 +43,16 @@ void f_prepare_t(struct arch_str_t *s_arch)
 
 //-------------------------------
 
-unsigned char flg_sec,flg_min,flg_arc_h,flg_arc_d,flg_month,avg_old,dlt_tm;
+unsigned char flg_sec=0;
+unsigned char flg_min=0;
+unsigned char flg_arc_h=0;
+unsigned char flg_arc_d=0;
+unsigned char flg_month=0;
+int avg_old=0;
+int dlt_tm=0;
+
 int year,month,day,hour,min,sec;
-unsigned char contrh=8;
+int contrh=8;
 
 unsigned char Size_str_min = 11; //размер структуры для записи 1-тип 6-дата,время 4-точка
 unsigned char Size_str=27; //1-тип 6-дата,время 20 - 4 точки по 4 байта
@@ -71,19 +78,7 @@ struct counter //счетчики для усреднений
 };
 struct counter cnt={0,0,0,0,0,};
 
-struct consump //расходы 9 шт.
-{
-  float avg;
-  float accum;
-  float hour;
-  float day;
-  float month;
-  float year;
-  float last_hour;
-  float last_day;
-  float last_month;
-};
-struct consump cons={0,0,0,0,0,0,0,0,0,};
+struct consump cons={0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,};
 
 void f_arch()
 {
@@ -94,12 +89,16 @@ void f_arch()
     //sec
     if (sec >= avg_old) dlt_tm=sec-avg_old;
     else dlt_tm=sec-avg_old+60;
-    if (dlt_tm >= 3)
+    if (dlt_tm >= 10) 
     {
       //усреднение секундных значений за 3 сек.
       avg_old=sec;
-      cons.avg=(cons.avg*cnt.sec+consumption)/cnt.sec+1; //формула усреднения расхода
-      cnt.sec++;
+      if(consumption>Qmin && consumption<Qmax)
+      {
+        //формула усреднения расхода
+        cons.avg=(cons.avg*cnt.sec+consumption)/(cnt.sec+1);
+        cnt.sec++;
+      }
     }
     //min
     if (min != Prt.old_min) 
@@ -124,7 +123,7 @@ void f_arch()
     }
     flg_sec=0;
     //накопления расхода раз в сек. и запись в энергонезависимую память
-    if(consumption>0) cons.accum+=consumption/3600;
+    if(consumption>Qmin && consumption<Qmax) cons.accum+=consumption/3600;
     ConvToBynare(cons.accum,cr);
     X607_WriteFn(0x9000,4,cr);
   }
@@ -138,27 +137,27 @@ void f_arch()
     cons.year += cons.accum;
     cons.accum=0.0;
     cnt.sec=0;
-    cons.avg=0.0;
+    cons.avg=consumption;
     SaveParameters();
   }
   if (flg_arc_h == 1) //раз в час
   {
     flg_arc_h=0;
     WriteArchive(0);
-    cons.last_hour += cons.hour;
+    cons.last_hour = cons.hour;
     cons.hour=0.0;
   }
   if (flg_arc_d == 1) //раз в сутки
   {
 	  flg_arc_d=0;
     WriteArchive(1);
-    cons.last_day += cons.day;
+    cons.last_day = cons.day;
     cons.day=0.0;
   }
 	if (flg_month == 1) //раз в месяц
 	{
 	  flg_month=0;
-    cons.last_month += cons.month;
+    cons.last_month = cons.month;
     cons.month=0.0;
   }
 }
@@ -237,8 +236,8 @@ void InitializeMain (void)
 /***** восстановление базовых параметров и счётчиков *********/
 void RestoreBasicParameters (void)
 {
-  unsigned char i,j,ind,buf[40];
-  ind=0; 
+  unsigned char i,j,ind,buf[100];
+  ind=0;
   X607_ReadFn(0x9000,32,buf); //32 - 8 переменных по 4 байта
   for (j=0;j<8;j++) //8 колличество переменных
   {
@@ -251,22 +250,22 @@ void RestoreBasicParameters (void)
         ConvToFloatVerify(&cons.day,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);              
       break;
       case 2:
-        ConvToFloatVerify(&cons.hour,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);        
+        ConvToFloatVerify(&cons.hour,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);     
       break;
       case 3:
         ConvToFloatVerify(&cons.last_day,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);
       break;
       case 4:
-        ConvToFloatVerify(&cons.last_hour,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);    
+        ConvToFloatVerify(&cons.last_hour,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);
       break;
       case 5:
-        ConvToFloatVerify(&cons.last_month,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);      
+        ConvToFloatVerify(&cons.last_month,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);   
       break;
       case 6:
-        ConvToFloatVerify(&cons.month,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);        
+        ConvToFloatVerify(&cons.month,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);      
       break;
       case 7:
-        ConvToFloatVerify(&cons.year,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);        
+        ConvToFloatVerify(&cons.year,buf[ind*4],buf[1+ind*4],buf[2+ind*4],buf[3+ind*4]);      
       break;
     }
     ind++;
@@ -276,6 +275,8 @@ void RestoreBasicParameters (void)
   cons.month += cons.accum;
   cons.year += cons.accum;
   cons.accum=0.0;
+  cons.avg=0;
+  cnt.sec=cnt.day=cnt.hour=cnt.min=cnt.month=0;
 }
 /******* преобразование действит. числа в 4 байта ****************/
 void ConvToBynare (float val,unsigned char * bytes)
@@ -309,7 +310,7 @@ void WriteArchive (unsigned char typ_arc)
     buf_arc[0]=typ_arc;for (i=0;i<6;i++) buf_arc[i+1]=ReadNVRAM(i);
     num_page=GetArcPoint(&pnt_arc,&segf);
     adrf=pnt_arc*Size_str;
-    for (i=0;i<Size_str;i++) FlashWrite(segf,adrf+i,buf_arc[i]);
+    for (i=0;i<Size_str;i++) /*FlashWrite(segf,adrf+i,buf_arc[i]);*/adrf+=i;
     pnt_arc++;
     ClearFlashSeg(num_page,pnt_arc);
   } 
@@ -375,11 +376,11 @@ void ClearFlashSeg (unsigned char page,unsigned pointer)
   {
     switch (page)
     {
-      case 0:num_page=1;FlashErase(0xe000);WriteNVRAM(15,0);
+      case 0:num_page=1;/*FlashErase(0xe000);*/WriteNVRAM(15,0);
 	     WriteNVRAM(16,0);break;
-      case 1:num_page=2;FlashErase(0xc000);WriteNVRAM(17,0);
+      case 1:num_page=2;/*FlashErase(0xc000);*/WriteNVRAM(17,0);
 	     WriteNVRAM(18,0);break;
-      case 2:num_page=0;FlashErase(0xd000);WriteNVRAM(13,0);
+      case 2:num_page=0;/*FlashErase(0xd000);*/WriteNVRAM(13,0);
 	     WriteNVRAM(14,0);break;
     } WriteNVRAM(12,num_page);/*очищаем страницу и сохраняем номер страницы*/
   } else
