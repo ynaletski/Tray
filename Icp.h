@@ -72,7 +72,7 @@ int f_empty_gets(int ii);
 int f_check_crc_ICP(char *buf);
 int f_prepare7000(char *Cmd,int CRC_flag);
 void f_icp_error(struct s_icp_dev *ICP_DEV,int error_type );
-//void f_cl_error();
+void f_cl_error();
 //int f_get_icp_error(struct s_icp_dev *ICP_DEV );
 //void f_icp_errS(int error_type );
 

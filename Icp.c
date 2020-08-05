@@ -368,28 +368,15 @@ int i;
  return 0;
 }*/
 /*----------------------------*/
-/*void f_cl_error()
+void f_cl_error()
 {
 int i;
 
-   Out_on(OUT8);
+   //Out_on(OUT8);
 
 #if defined(ICP_7060)
-  for(i=0;i<max_7060;i++)
-    I7060_fl[i]=0;
-#endif
-
-#if defined(RTU_ComSK)
-  for(i=0;i<max_SK;i++)
-    ComSK_fl[i]=0;
-#endif
-#if ( defined(RTU_Delta) || defined(RTU_Delta_C))
-  for(i=0;i<max_Dlt;i++)
-    Delta_fl[i]=0;
-#endif
-
-#if defined(TSD_GLB)
-     TSD_GLB_fl[0]=0;
+  /*for(i=0;i<max_7060;i++)
+    I7060_fl[i]=0;*/
 #endif
 
   for(i=0;i<ICP_ERR_N;i++)
@@ -408,13 +395,13 @@ int i;
 //modf &= ~pmp1_err_bit;
   if(sw_mmi==0) f_prn_begin();
 //  if(flag_pmp_init == 0)
-  f_wr_evt(evt_clr_err);
+  //f_wr_evt(evt_clr_err);
 //  else flag_pmp_init=0;
 
-  if(sw_mmi != 18)
+  /*if(sw_mmi != 18)
      fl_zeroing=0;
-   flag_set_out=0;
-}*/
+   flag_set_out=0;*/
+}
 
 /*----------------------------*/
 // фиктивные структуры для сохранения последовательности данных в EEPROM

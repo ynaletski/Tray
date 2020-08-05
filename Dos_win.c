@@ -80,6 +80,79 @@ void f_prn_error()
     MmiGotoxy(0,9);     MmiPrintf("  Sht-ESC очистка ошибок      ");
 }
 //-------------------------------------
+void  f_disp_error()
+{ // распечатывает ошибки
+
+ struct s_icp_dev *ICPl_DEV;
+int i,i1,i2;
+unsigned int itmp;
+  MmiGotoxy(0,0);  MmiPrintf("   ВРФ ");
+   i1=1;
+   i2=0;
+ for(i=0;i<=icp_lst_max;i++)
+   if(ICP_error[i])
+   {
+    i2++;
+    ICPl_DEV=ICP_dd[i];
+  if(i != icp_lst_max)
+  {
+ MmiGotoxy(0,i1++);   MmiPrintf("Ошибка в драйвере %9s:",ICPl_DEV->name );
+  }
+  else
+  {
+ MmiGotoxy(0,i1++);   MmiPrintf("Ошибка системы учета:           ");
+  }
+    if(i1 >= n_mmi_str) return;
+    itmp=ICP_error[i];
+  if(i != icp_lst_max)
+  {
+    if(itmp & RD_ERR)
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка чтения устройства");
+    if(i1 >= n_mmi_str) return;
+    }
+    if(itmp & WR_ERR)
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка записи в устройство");
+    if(i1 >= n_mmi_str) return;
+    }
+    if(itmp & WD_ERR)
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка Watch Dog");
+    if(i1 >= n_mmi_str) return;
+    }
+    if(itmp & Drive_ERR)
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка в устройстве,%02X", (itmp>>8) & 0xff);
+    if(i1 >= n_mmi_str) return;
+    }
+
+  }
+  else //(i == icp_lst_max)
+  {
+    if(itmp == EEE_CRC_error)
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка CRC EEPROM процессора");
+    if(i1 >= n_mmi_str) return;
+    }
+    if(itmp & Flash_erase_error )
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка стирания FLASH");
+    if(i1 >= n_mmi_str) return;
+    }
+    if(itmp & Flash_wr_error  )
+    {
+MmiGotoxy(0,i1++); MmiPrintf("Ошибка записи во FLASH");
+    if(i1 >= n_mmi_str) return;
+    }
+  }
+   }
+   if(i2==0)
+   {
+    MmiGotoxy(5,2); MmiPrintf("Ошибок нет");
+    MmiGotoxy(2,4); MmiPrintf("Enter - продолжить");
+   }
+}
 //-------------------------------------
 void f_drv_list_MMI(int *nn)
 { // показать список драйверов устройств
@@ -262,7 +335,7 @@ int f_menu_MMI()
             f_clr_scr_MMI();
             SetDisplayPage(EmptPage);
             sw_mmi=26;
-            //f_cl_error();
+            f_cl_error();
             MmiGotoxy(5,2);    MmiPuts("   Ошибки очищены   ");
             MmiGotoxy(0,4);    MmiPuts(" Enter - продолжить ");
             flag_esc=1;
@@ -273,7 +346,7 @@ int f_menu_MMI()
             f_clr_scr_MMI();
             SetDisplayPage(EmptPage);
             sw_mmi=26;
-            //f_disp_error();
+            f_disp_error();
             flag_esc=1;
         }
         else if(key==ESC)
