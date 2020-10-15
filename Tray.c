@@ -384,3 +384,7 @@ union  { float f; char c[4]; } o;
 #include "Arch.c"
 
 #include "Md5c.c"
+
+#if defined(ICP_7060)
+#include "I7060.C"
+#endif

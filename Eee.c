@@ -81,15 +81,15 @@ struct eee_dat EE_Dat[]=
 
 #if defined(ICP_7060) //(1) 
 
-&ICP_fict.status         ,sizeof(ICP_fict.status        ),
-&ICP_fict.port           ,sizeof(ICP_fict.port          ),
-&ICP_fict.addr           ,sizeof(ICP_fict.addr          ),
-&ICP_fict.type           ,sizeof(ICP_fict.type          ),
-&ICP_fict.format         ,sizeof(ICP_fict.format        ),
-&ICP_fict.channels       ,sizeof(ICP_fict.channels      ),
-&ICP_fict.CRC_flag       ,sizeof(ICP_fict.CRC_flag      ),
-&ICP_fict.pool_time      ,sizeof(ICP_fict.pool_time     ),
-&Rqst_fict.timeout    ,sizeof(I7017_Rqst[0].timeout   ),
+&I7060[0].status         ,sizeof(I7060[0].status        ),
+&I7060[0].port           ,sizeof(I7060[0].port          ),
+&I7060[0].addr           ,sizeof(I7060[0].addr          ),
+&I7060[0].type           ,sizeof(I7060[0].type          ),
+&I7060[0].format         ,sizeof(I7060[0].format        ),
+&I7060[0].channels       ,sizeof(I7060[0].channels      ),
+&I7060[0].CRC_flag       ,sizeof(I7060[0].CRC_flag      ),
+&I7060[0].pool_time      ,sizeof(I7060[0].pool_time     ),
+&I7060_Rqst[0].timeout    ,sizeof(I7060_Rqst[0].timeout   ),
 
 #else
 

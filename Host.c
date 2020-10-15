@@ -4,6 +4,14 @@ float www;
 unsigned char cccr[4];
 unsigned char bbbuf[10];
 ///////////////////////////////////
+int num_out1=1;  //  больший клапан регулирования расхода,пилот нормально открытый , /DN закрыть задвижку (OUT1=0)
+int num_out2=2;  //  меньший клапан регулирования расхода,пилот нормально закрытый ,  UP открыть задвижку (OUT2=1)
+int num_out3=7;  //  включение насоса
+int num_out4=6;  //  включение air switch (OUT4)
+int num_out5=3;  //  больший клапан нижнего  налива  // BIO_1 - исполнительный выход для CL1_SRC
+int num_out6=4;  //  меньший клапан нижнего  налива  // BIO_1 - исполнительный выход для CL2_SRC
+int num_out7=0;  //  подключение дисплея , по F1
+int num_out8=8;  //  сигнал аварии , инверсный , 1 - OK.
 
 
 int EchoComN=0;
@@ -1333,7 +1341,52 @@ struct dis_set  ds_range[]=
 /*----------------*/
 };
 //----------------------
+struct dis_set  ds_mko[]=
+{
+//----------------
+  &num_out1,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out2,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out3,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out4,
+  0,
+  16,
+  T_INT,
+//----------------
 
+  &num_out5,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out6,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out7,
+  0,
+  16,
+  T_INT,
+//----------------
+  &num_out8,
+  0,
+  16,
+  T_INT,
+/*----------------*/
+};
+//----------------------
 
 int f_intr()
 {
@@ -1418,7 +1471,8 @@ int f_intr()
 //---------------------------------
       if (!strcmp(intrpr.wrd,"COUNTERS" ))
         {   //'MD5'
-          cons.accum=cons.avg=cons.day=cons.hour=cons.month=cons.year=0;
+          cons.accum=cons.avg=cons.day=cons.hour=cons.month=
+          cons.year=cons.last_day=cons.last_hour=cons.last_month=0;
           goto fin;
         }
 //---------------------------------
@@ -1487,6 +1541,18 @@ int f_intr()
       if (!strcmp(intrpr.wrd,"RANGE" ))
         {   //'FACTOR'
           f_dis_set(ds_range,5,2); //6-длина введенного слова 2-колличество элементов
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"CLEAR" ))
+        {   //'CLEAR'
+          ClearArchive ();
+          goto fin;
+        }
+//---------------------------------
+      if (!strcmp(intrpr.wrd,"MKO" ))
+        {   //'MKO'
+          f_dis_set(ds_mko,3,8);
           goto fin;
         }
 //---------------------------------

@@ -1,4 +1,14 @@
+int mmi_arc;/*указатель архива*/
+unsigned mmi_seg,mmi_adr;/*сегмент и адрес*/
+unsigned char mmi_arc_page;
+unsigned char Display_flag;
+int Display_row=3;
+unsigned char dot,prm;
+unsigned char mmi_size;
+
 int n_pp=0;
+
+#define Key_dot      0x2e
 
 #define d_F2 (4)
 #define n_mmi_str 16 // количество строк на дисплее MMI
@@ -67,6 +77,57 @@ void f_prn_menu(int count, char *menu[])
     {
         MmiGotoxy(0,iii+1);  MmiPrintf(" %d. %s",iii,menu[iii]);
     }
+}
+//----------------------------------
+void f_prn_arch(unsigned char dot, unsigned char prm)
+{
+    float value;
+    unsigned char i,j,k;
+
+    if (mmi_arc<=0 && mmi_size<2) /*начало следующего прохода*/
+	{
+        mmi_size++;
+        GetArcReadPoint(&mmi_arc,&mmi_seg,&mmi_arc_page);
+    } 
+    else 
+    {
+        M: 
+        if(Display_flag == 1)
+	    {
+            ClearBuffer();
+            if (mmi_arc > 0)
+	        {
+                mmi_arc--;mmi_adr=mmi_arc*Size_str;
+                if (FlashRead(mmi_seg,mmi_adr) == dot)
+	            {
+			        k=0;
+			        for (i=0;i<3;i++)
+			        { /*прочитать и показать дату архива*/
+		  		        j=FlashRead(mmi_seg,mmi_adr+3-i);
+				        ByteToString(j,k,0);
+		  		        if (i!=2) mmi_str_[k+2]=Key_dot;
+				        k=k+3;
+			        } 
+			        k=9;
+			        for (i=0;i<2;i++)
+			        { /*прочитать и показать время архива*/
+		  		        j=FlashRead(mmi_seg,mmi_adr+4+i);
+				         ByteToString(j,k,0);
+		  		        if (i==0) mmi_str_[k+2]=0x3a;
+				        k=k+3;
+			        } 
+			        k=15;
+			        j=7+(prm)*4;
+			        ConvToFloatVerify(&value,FlashRead(mmi_seg,mmi_adr+j),FlashRead(mmi_seg,mmi_adr+j+1),FlashRead(mmi_seg,mmi_adr+j+2),FlashRead(mmi_seg,mmi_adr+j+3));
+			        FloatToString(value,mmi_str_,k);
+                    MmiGotoxy(0,Display_row);  MmiPrintf("%s",mmi_str_);
+                }
+                else goto M;
+            }
+            Display_row++;
+            if (Display_row > 13) Display_flag=0;
+        }
+    }   
 }
 //----------------------------------
 void f_prn_error()
@@ -377,6 +438,9 @@ int f_menu_MMI()
                 //MmiGotoxy(0,6);     MmiPuts("3  Просмотр журнала событий");
                 MmiGotoxy(0,6);     MmiPuts("3  Сервисные функции");
                 MmiGotoxy(0,8);     MmiPuts("4  Накопленные счетчики");
+                MmiGotoxy(0,10);    MmiPuts("5  Архив суточный");
+                MmiGotoxy(0,12);    MmiPuts("6  Архив часовой");
+
                 MmiGotoxy(0,15);    MmiPuts("                ESC  Возврат");
             }
             else
@@ -498,6 +562,44 @@ int f_menu_MMI()
 
                 tm_md=TimeStamp;
                 sw_mmi=140;
+                break;
+            }
+            else if(key== '5') // 5 Архив суточный
+            {
+                m_m5:
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts(" Меню 5. Архив суточный.");
+                MmiGotoxy(0,2);    MmiPuts(" Точка учета:");
+                MmiGotoxy(0,4);    MmiPuts(" 1. Расход средний");
+                MmiGotoxy(0,5);    MmiPuts(" 2. Расход час");
+                MmiGotoxy(0,6);    MmiPuts(" 3. Расход сутки");
+                MmiGotoxy(0,7);    MmiPuts(" 4. Расход месяц");
+                MmiGotoxy(0,8);    MmiPuts(" 5. Расход год");
+
+                MmiGotoxy(0,15);   MmiPuts("                ESC  Возврат");
+
+                tm_md=TimeStamp;
+                sw_mmi=145;
+                break;
+            }
+            else if(key== '6') // 5 Архив часовой
+            {
+                m_m6:
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts(" Меню 5. Архив часовой.");
+                MmiGotoxy(0,2);    MmiPuts(" Точка учета:");
+                MmiGotoxy(0,4);    MmiPuts(" 1. Расход средний");
+                MmiGotoxy(0,5);    MmiPuts(" 2. Расход час");
+                MmiGotoxy(0,6);    MmiPuts(" 3. Расход сутки");
+                MmiGotoxy(0,7);    MmiPuts(" 4. Расход месяц");
+                MmiGotoxy(0,8);    MmiPuts(" 5. Расход год");
+
+                MmiGotoxy(0,15);   MmiPuts("                ESC  Возврат");
+
+                tm_md=TimeStamp;
+                sw_mmi=147;
                 break;
             }
         break;
@@ -811,6 +913,188 @@ int f_menu_MMI()
             MmiGotoxy(0,9);  MmiPrintf("Месяц   : %8.3f  м3", cons.month);
             MmiGotoxy(0,10);  MmiPrintf("Пр.мес. : %8.3f  м3", cons.last_month);
             MmiGotoxy(0,11);  MmiPrintf("Год     : %8.3f  м3", cons.year);
+        break;
+        /*========================================*/
+        case 145:
+            Display_flag=1;
+            dot=1; //1-суточный применяется в функции f_prn_arch(dot,prm)
+            mmi_size=0; //применяется в функции f_prn_arch(dot,prm)
+            if(key==ESC)    /* переход в Меню 5. Архв суточный. */
+            {
+                goto main_menu;
+            }
+            else if(key== '1') // Просмотр архивной точки: Расход средний
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход средний");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=148;
+                prm=0; //0-расход средний применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '2') // Просмотр архивной точки: Расход час
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход час");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=148;
+                prm=1; //1-расход час применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '3') // Просмотр архивной точки: Расход сутки
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход сутки");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=148;
+                prm=2; //2-расход сутки применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+                else if(key== '4') // Просмотр архивной точки: Расход месяц
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход месяц");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=148;
+                prm=3; //3-расход месяц применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '5') // Просмотр архивной точки: Расход год
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход год");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=148;
+                prm=4; //4-расход год применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+        break;
+        /*========================================*/
+        case 147:
+            Display_flag=1;
+            dot=0; //0-часовой применяется в функции f_prn_arch(dot,prm)
+            mmi_size=0; //применяется в функции f_prn_arch(dot,prm)
+            if(key==ESC)    /* переход в Меню 6. Архв часовой. */
+            {
+                goto main_menu;
+            }
+            else if(key== '1') // Просмотр архивной точки: Расход средний
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход средний");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=149;
+                prm=0; //0-расход средний применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '2') // Просмотр архивной точки: Расход час
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход час");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=149;
+                prm=1; //1-расход час применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '3') // Просмотр архивной точки: Расход сутки
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход сутки");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=149;
+                prm=2; //2-расход сутки применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+                else if(key== '4') // Просмотр архивной точки: Расход месяц
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход месяц");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=149;
+                prm=3; //3-расход месяц  применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+            else if(key== '5') // Просмотр архивной точки: Расход год
+            {
+                SetDisplayPage(EmptPage);
+                f_clr_scr_MMI();
+                MmiGotoxy(0,0);    MmiPuts("   Просмотр архивной точки");
+                MmiGotoxy(0,1);    MmiPuts(" Точка учета: Расход год");
+                mmi_arc_page = GetArcPoint(&mmi_arc,&mmi_seg);
+                MmiGotoxy(0,15);   MmiPuts(" F3-след.       ESC  Возврат");
+                tm_md=TimeStamp;
+                sw_mmi=149;
+                prm=4; //4-расход год применяется в функции f_prn_arch(dot,prm)
+                break;
+            }
+        break;
+        /*========================================*/
+        case 148:
+            if(key==ESC)    /* переход в Меню 6. Архв суточный. */
+            {
+                goto m_m5;
+            }
+            if(key==F3 && mmi_size<2)
+            {
+                Display_row=3;
+                Display_flag=1;
+            }
+            else
+            {
+                f_prn_arch(dot,prm);
+            }
+        break;
+        /*========================================*/
+        case 149:
+            if(key==ESC)    /* переход в Меню 6. Архв часовой. */
+            {
+                goto m_m6;
+            }
+            if(key==F3 && mmi_size<2)
+            {
+                Display_row=3;
+                Display_flag=1;
+            }
+            else
+            {
+                f_prn_arch(dot,prm);
+            }
         break;
         /*========================================*/
         case 150: // 3  Сервисные функции

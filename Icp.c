@@ -5,11 +5,11 @@
 struct s_icp_dev  *ICP_dd[]={
 
 &WDOG[0],                     // 0
-/*
+
 #if defined(ICP_7060)
     &I7060[0],                // 2
 #endif
-#if defined(ICP_7041)
+/*#if defined(ICP_7041)
     &I7041[0],                // 3
 #endif
 */
@@ -375,8 +375,8 @@ int i;
    //Out_on(OUT8);
 
 #if defined(ICP_7060)
-  /*for(i=0;i<max_7060;i++)
-    I7060_fl[i]=0;*/
+  for(i=0;i<max_7060;i++)
+    I7060_fl[i]=0;
 #endif
 
   for(i=0;i<ICP_ERR_N;i++)

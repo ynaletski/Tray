@@ -43,6 +43,8 @@ void f_prepare_t(struct arch_str_t *s_arch)
 
 //-------------------------------
 
+unsigned char mmi_str_[30];
+
 unsigned char flg_sec=0;
 unsigned char flg_min=0;
 unsigned char flg_arc_h=0;
@@ -57,7 +59,10 @@ int contrh=8;
 unsigned char Size_str_min = 11; //размер структуры для записи 1-тип 6-дата,время 4-точка
 unsigned char Size_str=27; //1-тип 6-дата,время 20 - 4 точки по 4 байта
 
-#define Max_arch_record   20  /*макс длина архив записи в байтах*/
+#define Max_arch_record   27  /*макс длина архив записи в байтах*/
+
+#define Key_mask      0xf
+#define Key_blank    0x20
 
 struct runtime
 {
@@ -307,10 +312,11 @@ void WriteArchive (unsigned char typ_arc)
 
   if (typ_arc != 2)
   {
-    buf_arc[0]=typ_arc;for (i=0;i<6;i++) buf_arc[i+1]=ReadNVRAM(i);
+    buf_arc[0]=typ_arc;
+    for (i=0;i<6;i++) buf_arc[i+1]=ReadNVRAM(i);
     num_page=GetArcPoint(&pnt_arc,&segf);
     adrf=pnt_arc*Size_str;
-    for (i=0;i<Size_str;i++) /*FlashWrite(segf,adrf+i,buf_arc[i]);*/adrf+=i;
+    for (i=0;i<Size_str;i++) FlashWrite(segf,adrf+i,buf_arc[i]);
     pnt_arc++;
     ClearFlashSeg(num_page,pnt_arc);
   } 
@@ -355,17 +361,49 @@ void FormateArchive (unsigned char buf[])
 /****** формирование указателя архива и сегмента *******************/
 unsigned char GetArcPoint (int *pointer,unsigned *segment)
 { /*применение: инициализация, запись в архив, работа с MMI*/
-  unsigned char page;page=ReadNVRAM(12);
+  unsigned char page;
+  page=ReadNVRAM(12);
   switch (page)
   {
-    case 0:*segment=0xd000;*pointer=ReadNVRAM(13)*256+ReadNVRAM(14);
-	   break;
-    case 1:*segment=0xe000;*pointer=ReadNVRAM(15)*256+ReadNVRAM(16);
-	   break;
-    case 2:*segment=0xc000;*pointer=ReadNVRAM(17)*256+ReadNVRAM(18);
-	   break;
-  } return page;
+    case 0:
+      *segment=0xd000;
+      *pointer=ReadNVRAM(13)*256+ReadNVRAM(14);
+	  break;
+    case 1:
+      *segment=0xe000;
+      *pointer=ReadNVRAM(15)*256+ReadNVRAM(16);
+	  break;
+    case 2:
+      *segment=0xc000;
+      *pointer=ReadNVRAM(17)*256+ReadNVRAM(18);
+	  break;
+  } 
+  return page;
 }
+
+/********* получение новых настроек архива при чтении *************/
+void GetArcReadPoint(int *pointer,unsigned *segment,unsigned char *page)
+{
+  switch (*page)
+  {
+    case 0:
+      *page=2;
+      *segment=0xc000;
+	    *pointer=ReadNVRAM(17)*256+ReadNVRAM(18);
+    break;
+    case 1:
+      *page=0;
+      *segment=0xd000;
+	    *pointer=ReadNVRAM(13)*256+ReadNVRAM(14);
+    break;
+    case 2:
+      *page=1;
+      *segment=0xe000;
+	    *pointer=ReadNVRAM(15)*256+ReadNVRAM(16);
+    break;
+  }
+}
+/**********************************/
 
 /******* сохранение указателя и очистка сегмента флэш-памяти *********/
 void ClearFlashSeg (unsigned char page,unsigned pointer)
@@ -376,14 +414,28 @@ void ClearFlashSeg (unsigned char page,unsigned pointer)
   {
     switch (page)
     {
-      case 0:num_page=1;/*FlashErase(0xe000);*/WriteNVRAM(15,0);
-	     WriteNVRAM(16,0);break;
-      case 1:num_page=2;/*FlashErase(0xc000);*/WriteNVRAM(17,0);
-	     WriteNVRAM(18,0);break;
-      case 2:num_page=0;/*FlashErase(0xd000);*/WriteNVRAM(13,0);
-	     WriteNVRAM(14,0);break;
-    } WriteNVRAM(12,num_page);/*очищаем страницу и сохраняем номер страницы*/
-  } else
+      case 0:
+        num_page=1;
+        FlashErase(0xe000);
+        WriteNVRAM(15,0);
+	      WriteNVRAM(16,0);
+      break;
+      case 1:
+        num_page=2;
+        FlashErase(0xc000);
+        WriteNVRAM(17,0);
+	      WriteNVRAM(18,0);
+      break;
+      case 2:
+        num_page=0;
+        FlashErase(0xd000);
+        WriteNVRAM(13,0);
+	      WriteNVRAM(14,0);
+      break;
+    } 
+    WriteNVRAM(12,num_page);/*очищаем страницу и сохраняем номер страницы*/
+  } 
+  else
   {
     i=pointer/256;j=pointer-i*256;
     switch (page)
@@ -393,4 +445,124 @@ void ClearFlashSeg (unsigned char page,unsigned pointer)
       case 2:WriteNVRAM(17,i);WriteNVRAM(18,j);break;
     } /*сохраняем указатель*/
   }
+}
+
+/******** очистка час-сут архива после изм.настроек точек ************/
+void ClearArchive ()
+{
+  unsigned char i;
+  for (i=12;i<19;i++) WriteNVRAM(i,0);FlashErase(0xd000);
+  //Size_str=InitArchive(&Device);
+}
+
+/***********  чтение из архива часового или суточного **************/
+void ReadFromArchive (unsigned char bufer[])
+{
+  unsigned char i,j,val,num_page,buf_arc[146],typ_arc;
+  int pnt_arc;
+  unsigned segf,adrf;
+  num_page=bufer[7];
+  pnt_arc=bufer[8]*256+bufer[9];
+  typ_arc=bufer[10]; 
+  bufer[11]=0;
+  switch (num_page)
+  {
+    case 0:segf=0xd000;break; case 1:segf=0xe000;break;
+    case 2:segf=0xc000;break;
+  }
+  for (i=0;;)
+  {
+    adrf=pnt_arc*Size_str;
+    if (FlashRead(segf,adrf)==typ_arc || typ_arc==255)
+    {
+      for (j=0;j < Size_str;j++)
+      { 
+        val=FlashRead(segf,adrf+j); 
+        bufer[12+i*Size_str+j]=val;
+      } 
+      i++;
+    }  
+    pnt_arc--; 
+    if (pnt_arc < 0)
+    { /*обнаружен конец страницы, переключение на следующую*/
+      switch (num_page)
+      {
+	      case 0:
+          num_page=2; 
+          segf=0xc000;
+	        pnt_arc=ReadNVRAM(17)*256+ReadNVRAM(18);
+        break;
+	      case 1:
+          num_page=0; 
+          segf=0xd000;
+	        pnt_arc=ReadNVRAM(13)*256+ReadNVRAM(14);
+        break;
+	      case 2:
+          num_page=1; 
+          segf=0xe000;
+	        pnt_arc=ReadNVRAM(15)*256+ReadNVRAM(16);
+        break;
+      } 
+      if (pnt_arc == 0) 
+      {
+        bufer[11]=1;
+        break;
+      }
+      if (num_page == ReadNVRAM(12)) 
+      {
+        bufer[11]=1;
+        break;
+      }/*не текущая*/
+    } 
+    if (((i+1)*Size_str+16) > 256) break;
+  } 
+  bufer[7]=i; 
+  bufer[8]=num_page; 
+  bufer[9]=pnt_arc/256;
+  bufer[10]=pnt_arc-bufer[9]*256; 
+  bufer[6]=16+i*Size_str;
+}
+
+/*********** преобразование байта в два символа ***********/
+void ByteToString (unsigned char val,unsigned char index,unsigned char typ)
+{ /*используется при выводе архивных даты и времени*/
+  unsigned char a,d,e,c,b;c=10;b=val;a=0;
+  while (c>=1)
+  {
+    d=b/c; 
+    if (typ==1 && a==0 && d==0) 
+    {mmi_str_[index]=0x20;index++;goto M;}
+    if (d < 10)
+    { mmi_str_[index]=hex_to_ascii[d & Key_mask];index++;} else
+    {
+      e=d/10; mmi_str_[index]=hex_to_ascii[e & Key_mask];index++;
+      e=d-e*10; mmi_str_[index]=hex_to_ascii[e & Key_mask];index++;
+    } 
+M:  b=b-d*c;c=c/10;a++;
+  }
+}
+
+/************ преобразоваие в символьную строку ******************/
+void FloatToString (float val,unsigned char buf_str[],
+		   unsigned char offset)
+{ /*используется при выводе конфиг.или архивного значений*/
+  unsigned char i,buf[50],flag,j; double musor,value;
+  flag=j=0; if (val < 0) flag=1; value=fabs(val);
+  if (value < 100000)
+  {
+    musor=value;
+    M: if (musor < 10) goto M1;
+       musor=musor/10; j++; goto M;
+    M1:
+    value=value*pow(10,5-j); musor=modf(value, &value);
+    if (musor >= 0.5) value=value+1; value=value/pow(10,5-j);
+  } else modf(value, &value); if (flag == 1) value=-value;
+  gcvt(value,10,buf); j=0;
+  for (i=0;i<10;i++) if (buf[i] !=0) buf_str[i+offset]=buf[i]; else break;
+}
+
+/*********** очистка буфера вывода на экран *********************/
+void ClearBuffer (void)
+{
+  unsigned char i;for (i=0;i< 30;i++) mmi_str_[i]=Key_blank;
 }

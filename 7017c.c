@@ -228,7 +228,6 @@ m1:
    }
    else
    {
-
          i7017_inp_err[nn]++;
          if(i7017_inp_err[nn]>=I7017_max_inp_err)
          {

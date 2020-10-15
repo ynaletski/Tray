@@ -20,6 +20,7 @@
 #include "Eee.h"
 #include "Arch.h"
 #include "Md5.h"
+#include "i7060.h"
 
 #include"7188xa.h"
 #include<X607.h>
